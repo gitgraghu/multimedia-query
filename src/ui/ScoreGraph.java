@@ -28,7 +28,7 @@ public class ScoreGraph extends Canvas{
 		graphPoints = new ArrayList<Point>();
 	}
 	
-	public void createGraphPoints(Score vidscore){
+	public void createGraphPoints(Score vidscore,double yscale){
 		graphPoints.clear();
 		
 		int i,framenum,x,y;
@@ -37,9 +37,9 @@ public class ScoreGraph extends Canvas{
 		for(i = 0; i < vidscore.framenumbers.size(); i++){
 			framenum = vidscore.framenumbers.get(i);
 			score = vidscore.score.get(i);
-			System.out.println("framenum" + framenum + "score:" + score);
+//			System.out.println("framenum" + framenum + "score:" + score);
 			x = (int) Math.round((framenum/(double)Constants.VIDEO_FRAMECOUNT)*getWidth());
-			y = (int) Math.round((score/0.25)*getHeight());
+			y = (int) Math.round((score/yscale)*getHeight());
 			graphPoints.add(new Point(x,y));
 		}
 	}

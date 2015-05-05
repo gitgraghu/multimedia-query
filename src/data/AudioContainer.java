@@ -91,8 +91,6 @@ public class AudioContainer {
 	   public List<AudioKeyFrame> GenerateAudioKeyFrames(){
        	
        	List<AudioKeyFrame> audiokeyframes= new ArrayList<AudioKeyFrame>();
-//      int numchunks = (int) (framelength/(framerate*Constants.AUDIO_CHUNK_TIME));
-//      int chunksize = (int) (framerate*Constants.AUDIO_CHUNK_TIME);
        	
        	int chunksize = (int) (Constants.FFT_WINDOW_SIZE*Constants.NUM_FFT_WINDOWS);
        	int numchunks = (int) (framelength/chunksize);
@@ -101,8 +99,7 @@ public class AudioContainer {
        	for(n = 0; n < numchunks; n++){
        		
        		AudioKeyFrame audiokeyframe = new AudioKeyFrame();
-       		audiokeyframe.index = (int) (((n*chunksize)/framerate)/(Constants.FRAME_DELAY));
-       		System.out.println(audiokeyframe.index);
+       		audiokeyframe.index = (int) ((((2*n+1)*chunksize)/(double)framerate)/(2*Constants.FRAME_DELAY));
 
        		double[] spectrum = new double[Constants.FFT_WINDOW_SIZE/2];
        		
@@ -111,13 +108,13 @@ public class AudioContainer {
        		  
        		  Complex x[] = new Complex[Constants.FFT_WINDOW_SIZE];
        		  for (int j = 0; j < Constants.FFT_WINDOW_SIZE; j++) {
-       	            x[j] = new Complex(samplesleft[i], 0);
+       	            x[j] = new Complex(samplesleft[i+j], 0);
        		  }
        		  
        		  Complex[] yleft = FFT.fft(x);
        		  
        		  for (int j = 0; j < Constants.FFT_WINDOW_SIZE; j++) {
-       	            x[j] = new Complex(samplesright[i], 0);
+       	            x[j] = new Complex(samplesright[i+j], 0);
        		  }
        		  
        		  Complex[] yright = FFT.fft(x);
@@ -141,7 +138,7 @@ public class AudioContainer {
 	   
 		private double CalculateDirectedDivergence(AudioKeyFrame previous, AudioKeyFrame current){
 			
-			double directeddivergence = Helper.CalculateEulersDistance(previous.spectrum, current.spectrum);
+			double directeddivergence = (Helper.CalculateEucledianDistance(previous.spectrum, current.spectrum))/5.0;
 			
 			return directeddivergence;
 		}
@@ -195,9 +192,10 @@ public class AudioContainer {
 			    		maxdivergence=mindivergence;	
 			    	}
 				}
-				
+
 				audioscores.put(videoname, audioscore);
-				audiomatch.put(videoname, maxdivergence);
+				audiomatch.put(videoname, totaldivergence/querykeyframes.size());
+
 			}
 			
 			Object ret[] = new Object[2];
@@ -234,8 +232,10 @@ public class AudioContainer {
 							minvidkeyframe = q.getIndex();
 						}
 					}
-						audioscore.framenumbers.add(minvidkeyframe);
-						audioscore.score.add(mindivergence);
+						if(minvidkeyframe!=-1){
+							audioscore.framenumbers.add(minvidkeyframe);
+							audioscore.score.add(mindivergence);
+						}
 				    }
 				  
 			return audioscore;

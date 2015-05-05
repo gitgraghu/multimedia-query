@@ -22,13 +22,14 @@ public class VideoThread extends Thread {
 	JSlider videoslider;
 	ScoreGraph videoscoregraph;
 	ScoreGraph audioscoregraph;
+	ScoreGraph motionscoregraph;
 	
 	long framedelay;
 	int curframe = 0;
 	boolean videopaused = false;
 	boolean videostarted = false;
 	
-	public VideoThread(VideoContainer videocontainer, ImageIcon videoframe, JLabel videobox, JSlider videoslider, ScoreGraph videoscoregraph, ScoreGraph audioscoregraph){
+	public VideoThread(VideoContainer videocontainer, ImageIcon videoframe, JLabel videobox, JSlider videoslider, ScoreGraph videoscoregraph, ScoreGraph audioscoregraph, ScoreGraph motionscoregraph){
 		
 		this.video 		= videocontainer;
 		this.frameimage = videoframe;
@@ -36,6 +37,7 @@ public class VideoThread extends Thread {
 		this.videoslider= videoslider;
 		this.videoscoregraph = videoscoregraph;
 		this.audioscoregraph = audioscoregraph;
+		this.motionscoregraph = motionscoregraph;
 		
 		try {
 			audioClip = AudioSystem.getClip();
@@ -65,7 +67,7 @@ public class VideoThread extends Thread {
 					}
 			}
 		curframe = 0;
-		this.suspend();	
+		this.stopvideo();	
 		}	
 	}
 	
@@ -78,6 +80,8 @@ public class VideoThread extends Thread {
 			int graphlineX = (int) Math.round(((double)curframe/Constants.VIDEO_FRAMECOUNT)*videoscoregraph.getWidth());
 			videoscoregraph.setCurrentX(graphlineX);
 			audioscoregraph.setCurrentX(graphlineX);
+			motionscoregraph.setCurrentX(graphlineX);
+			motionscoregraph.repaint();
 			audioscoregraph.repaint();
 			videoscoregraph.repaint();
 		}

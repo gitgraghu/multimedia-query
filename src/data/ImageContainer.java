@@ -58,13 +58,32 @@ public class ImageContainer extends VideoKeyFrame{
 		 }	
 	}
 	
+	public int[][] CreateImageMatrix(){
+		int x,y,Y,ind = 0;
+		int[][] Ymatrix = new int[Constants.IMAGE_HEIGHT][Constants.IMAGE_WIDTH];
+		
+		 for(y = 0; y < Constants.IMAGE_HEIGHT; y++){
+			 for(x = 0; x < Constants.IMAGE_WIDTH; x++){
+				 int R = Helper.ByteToInt(imagebytes[ind]);					
+				 int G = Helper.ByteToInt(imagebytes[ind+Constants.IMAGE_HEIGHT*Constants.IMAGE_WIDTH]);	
+				 int B = Helper.ByteToInt(imagebytes[ind+Constants.IMAGE_HEIGHT*Constants.IMAGE_WIDTH*2]); 
+		 
+			     Y = Helper.double2int((R * 0.29891 + G * 0.58661 + B * 0.11448));
+			     Ymatrix[y][x] = Y;
+			     ind++;
+			 }
+		 }
+		 
+		return Ymatrix;	
+	}
+	
 	public void GenerateHistogramDistributions(){
 		
 		 int x,y,ind = 0;
+//		 int Y,U,V;
 		 int histY[] = new int[256];
 		 int histU[] = new int[256];
 		 int histV[] = new int[256];
-		 int Y,U,V;
 		 
 		 for(y = 0; y < Constants.IMAGE_HEIGHT; y++){
 			 for(x = 0; x < Constants.IMAGE_WIDTH; x++){
@@ -73,21 +92,26 @@ public class ImageContainer extends VideoKeyFrame{
 				 int G = Helper.ByteToInt(imagebytes[ind+Constants.IMAGE_HEIGHT*Constants.IMAGE_WIDTH]);	
 				 int B = Helper.ByteToInt(imagebytes[ind+Constants.IMAGE_HEIGHT*Constants.IMAGE_WIDTH*2]); 
 		 
-			     Y = Helper.double2int((R * 0.29891 + G * 0.58661 + B * 0.11448));
-			     U = Math.min(255, (Helper.double2int((R * (-0.16874) - G * 0.33126 + B * 0.5)) + 128));
-			     V = Math.min(255, (Helper.double2int((R * 0.5 - G * 0.41869 - B * 0.08131)) + 128));
+//			     Y = Helper.double2int((R * 0.29891 + G * 0.58661 + B * 0.11448));
+//			     U = Math.min(255, (Helper.double2int((R * (-0.16874) - G * 0.33126 + B * 0.5)) + 128));
+//			     V = Math.min(255, (Helper.double2int((R * 0.5 - G * 0.41869 - B * 0.08131)) + 128));
+				 
+//				 Y = Helper.double2int(( 0.299)*R 	+ ( 0.587)*G 	+ ( 0.114)*B);
+//				 U = Helper.double2int((-0.147)*R 	+ (-0.289)*G 	+ ( 0.436)*B);
+//				 V = Helper.double2int(( 0.615)*R 	+ (-0.515)*G 	+ (-0.100)*B);
 			     
-			     histY[Y]++;
-			     histU[U]++;
-			     histV[V]++;
+				 histY[R]++;
+			     histU[G]++;
+			     histV[B]++;
 				 
 				 ind++;
 			 }
+			
 		 }
 		 
 		 int i = 0;
 		 pdfY = new double[256];
-		 for (i = 0; i < 256; i++){
+		 for (i=0; i < 256; i++){
 			 pdfY[i] = (double)histY[i]/(Constants.IMAGE_WIDTH*Constants.IMAGE_HEIGHT);
 		 }
 		 pdfU = new double[256];
@@ -98,9 +122,7 @@ public class ImageContainer extends VideoKeyFrame{
 		 for (i=0; i < 256; i++){
 			 pdfV[i] = (double)histV[i]/(Constants.IMAGE_WIDTH*Constants.IMAGE_HEIGHT);
 		 }
-		 
-		 
+ 
 	}
-	
 	
 }
